@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional, Set
 
-from sqlmeta.objects.base import (
+from sqlmeta.base import (
     ConstraintType,
     SqlColumn,
     SqlConstraint,

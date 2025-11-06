@@ -39,7 +39,7 @@ from sqlmeta.comparison.diff_models import (
     ViewDiff,
 )
 from sqlmeta.comparison.type_normalizer import DataTypeNormalizer
-from sqlmeta.objects.base import ConstraintType, SqlColumn, SqlConstraint
+from sqlmeta.base import ConstraintType, SqlColumn, SqlConstraint
 from sqlmeta.objects.database_link import DatabaseLink
 from sqlmeta.objects.event import Event
 from sqlmeta.objects.extension import Extension
@@ -534,7 +534,7 @@ class ObjectComparator:
             UNIQUE constraints with different names but identical columns. We filter
             based on column signature only, not name matching, to avoid false positives.
             """
-            from sqlmeta.objects.base import ConstraintType
+            from sqlmeta.base import ConstraintType
 
             # Find all PRIMARY KEY constraints with their column signatures
             pk_signatures = set()

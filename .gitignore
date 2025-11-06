@@ -49,3 +49,7 @@ docs/_build/
 # OS
 .DS_Store
 Thumbs.db
+
+# Markdown files (except README)
+*.md
+!README.md

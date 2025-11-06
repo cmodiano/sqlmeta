@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional
 
-from sqlmeta.objects.base import SqlObject, SqlObjectType
+from sqlmeta.base import SqlObject, SqlObjectType
 
 
 class Index(SqlObject):

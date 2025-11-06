@@ -6,7 +6,7 @@ Represents a database trigger with its definition, timing, and events.
 
 from typing import Any, Dict, Optional
 
-from sqlmeta.objects.base import SqlObject, SqlObjectType
+from sqlmeta.base import SqlObject, SqlObjectType
 
 
 class Trigger(SqlObject):
