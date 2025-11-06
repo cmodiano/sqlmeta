@@ -1,0 +1,88 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sqlmeta"
+version = "0.1.0"
+description = "Universal SQL metadata and schema representation for Python"
+readme = "README.md"
+authors = [
+    {name = "Your Name", email = "your@email.com"}
+]
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Database",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+keywords = [
+    "sql",
+    "schema",
+    "metadata",
+    "database",
+    "orm",
+    "sqlalchemy",
+    "pydantic",
+    "postgresql",
+    "mysql",
+    "oracle",
+    "sqlserver",
+]
+requires-python = ">=3.8"
+dependencies = []
+
+[project.optional-dependencies]
+sqlalchemy = ["sqlalchemy>=1.4"]
+pydantic = ["pydantic>=2.0"]
+alembic = ["alembic>=1.7"]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "mypy>=1.0",
+    "ruff>=0.1.0",
+]
+all = [
+    "sqlalchemy>=1.4",
+    "pydantic>=2.0",
+    "alembic>=1.7",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourorg/sqlmeta"
+Documentation = "https://sqlmeta.readthedocs.io"
+Repository = "https://github.com/yourorg/sqlmeta"
+Issues = "https://github.com/yourorg/sqlmeta/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["sqlmeta*"]
+exclude = ["tests*", "docs*", "examples*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = [
+    "--verbose",
+    "--cov=sqlmeta",
+    "--cov-report=term-missing",
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py38"]
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
