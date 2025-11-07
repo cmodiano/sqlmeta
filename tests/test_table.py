@@ -11,7 +11,7 @@ def test_create_simple_table():
         columns=[
             SqlColumn("id", "INTEGER", is_primary_key=True),
             SqlColumn("email", "VARCHAR(255)", is_nullable=False),
-        ]
+        ],
     )
 
     assert table.name == "users"
@@ -27,7 +27,7 @@ def test_table_to_dict():
         schema="public",
         columns=[
             SqlColumn("id", "INTEGER", is_primary_key=True),
-        ]
+        ],
     )
 
     table_dict = table.to_dict()

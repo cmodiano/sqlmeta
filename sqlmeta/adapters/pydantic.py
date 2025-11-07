@@ -16,31 +16,29 @@ from typing import Any, Dict, Optional, Type
 
 try:
     from pydantic import BaseModel, Field, create_model
+
     PYDANTIC_AVAILABLE = True
 except ImportError:
     PYDANTIC_AVAILABLE = False
 
 
 if not PYDANTIC_AVAILABLE:
+
     def to_pydantic(*args, **kwargs):
         raise ImportError(
-            "Pydantic is not installed. "
-            "Install it with: pip install sqlmeta[pydantic]"
+            "Pydantic is not installed. " "Install it with: pip install sqlmeta[pydantic]"
         )
 
     def to_pydantic_schema(*args, **kwargs):
         raise ImportError(
-            "Pydantic is not installed. "
-            "Install it with: pip install sqlmeta[pydantic]"
+            "Pydantic is not installed. " "Install it with: pip install sqlmeta[pydantic]"
         )
+
 else:
     from sqlmeta import Table, SqlColumn
 
-
     def to_pydantic(
-        table: Table,
-        model_name: Optional[str] = None,
-        use_title_case: bool = True
+        table: Table, model_name: Optional[str] = None, use_title_case: bool = True
     ) -> Type[BaseModel]:
         """Convert sqlmeta Table to Pydantic BaseModel.
 
@@ -84,15 +82,15 @@ else:
             field_kwargs = {}
 
             if col.default_value:
-                field_kwargs['default'] = col.default_value
+                field_kwargs["default"] = col.default_value
             elif col.nullable:
-                field_kwargs['default'] = None
+                field_kwargs["default"] = None
             else:
                 # Required field
                 pass
 
-            if hasattr(col, 'comment') and col.comment:
-                field_kwargs['description'] = col.comment
+            if hasattr(col, "comment") and col.comment:
+                field_kwargs["description"] = col.comment
 
             if field_kwargs:
                 fields[col.name] = (python_type, Field(**field_kwargs))
@@ -103,7 +101,6 @@ else:
         pydantic_model = create_model(model_name, **fields)
 
         return pydantic_model
-
 
     def to_pydantic_schema(table: Table) -> Dict[str, Any]:
         """Convert sqlmeta Table to Pydantic JSON Schema.
@@ -117,12 +114,10 @@ else:
         model = to_pydantic(table)
         return model.model_json_schema()
 
-
     def _to_pascal_case(snake_str: str) -> str:
         """Convert snake_case to PascalCase."""
-        components = snake_str.split('_')
-        return ''.join(x.title() for x in components)
-
+        components = snake_str.split("_")
+        return "".join(x.title() for x in components)
 
     def _map_sql_type_to_python(sql_type: str) -> Type:
         """Map SQL type to Python type."""
@@ -132,33 +127,33 @@ else:
         sql_type_upper = sql_type.upper()
 
         # Integer types
-        if any(t in sql_type_upper for t in ['INT', 'SERIAL', 'BIGINT', 'SMALLINT']):
+        if any(t in sql_type_upper for t in ["INT", "SERIAL", "BIGINT", "SMALLINT"]):
             return int
 
         # Float types
-        if any(t in sql_type_upper for t in ['FLOAT', 'DOUBLE', 'REAL']):
+        if any(t in sql_type_upper for t in ["FLOAT", "DOUBLE", "REAL"]):
             return float
 
         # Decimal types
-        if any(t in sql_type_upper for t in ['NUMERIC', 'DECIMAL', 'MONEY']):
+        if any(t in sql_type_upper for t in ["NUMERIC", "DECIMAL", "MONEY"]):
             return Decimal
 
         # Boolean
-        if 'BOOL' in sql_type_upper:
+        if "BOOL" in sql_type_upper:
             return bool
 
         # DateTime types
-        if 'TIMESTAMP' in sql_type_upper or 'DATETIME' in sql_type_upper:
+        if "TIMESTAMP" in sql_type_upper or "DATETIME" in sql_type_upper:
             return datetime
 
-        if 'DATE' in sql_type_upper:
+        if "DATE" in sql_type_upper:
             return date
 
-        if 'TIME' in sql_type_upper:
+        if "TIME" in sql_type_upper:
             return time
 
         # Binary types
-        if any(t in sql_type_upper for t in ['BLOB', 'BYTEA', 'BINARY', 'VARBINARY']):
+        if any(t in sql_type_upper for t in ["BLOB", "BYTEA", "BINARY", "VARBINARY"]):
             return bytes
 
         # Default to string
@@ -166,6 +161,6 @@ else:
 
 
 __all__ = [
-    'to_pydantic',
-    'to_pydantic_schema',
+    "to_pydantic",
+    "to_pydantic_schema",
 ]

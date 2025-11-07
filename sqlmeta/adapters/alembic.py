@@ -25,34 +25,33 @@ try:
         DropTableOp,
         MigrationScript,
     )
+
     ALEMBIC_AVAILABLE = True
 except ImportError:
     ALEMBIC_AVAILABLE = False
 
 
 if not ALEMBIC_AVAILABLE:
+
     def generate_operations(*args, **kwargs):
         raise ImportError(
-            "Alembic is not installed. "
-            "Install it with: pip install sqlmeta[alembic]"
+            "Alembic is not installed. " "Install it with: pip install sqlmeta[alembic]"
         )
 
     def to_alembic_table(*args, **kwargs):
         raise ImportError(
-            "Alembic is not installed. "
-            "Install it with: pip install sqlmeta[alembic]"
+            "Alembic is not installed. " "Install it with: pip install sqlmeta[alembic]"
         )
 
     def generate_migration_script(*args, **kwargs):
         raise ImportError(
-            "Alembic is not installed. "
-            "Install it with: pip install sqlmeta[alembic]"
+            "Alembic is not installed. " "Install it with: pip install sqlmeta[alembic]"
         )
+
 else:
     from sqlmeta import Table, SqlColumn
     from sqlmeta.comparison.comparator import ObjectComparator
     from sqlmeta.comparison.diff_models import TableDiff
-
 
     def to_alembic_table(table: Table) -> CreateTableOp:
         """Convert sqlmeta Table to Alembic CreateTableOp.
@@ -79,6 +78,7 @@ else:
         # Convert to SQLAlchemy table first
         try:
             from sqlmeta.adapters.sqlalchemy import to_sqlalchemy
+
             metadata = MetaData()
             sa_table = to_sqlalchemy(table, metadata)
 
@@ -90,11 +90,8 @@ else:
                 "Install it with: pip install sqlmeta[all]"
             )
 
-
     def generate_operations(
-        source_table: Optional[Table],
-        target_table: Optional[Table],
-        dialect: Optional[str] = None
+        source_table: Optional[Table], target_table: Optional[Table], dialect: Optional[str] = None
     ) -> List:
         """Generate Alembic operations from table comparison.
 
@@ -131,10 +128,7 @@ else:
 
         # Handle table drop
         if source_table is not None and target_table is None:
-            operations.append(DropTableOp(
-                source_table.name,
-                schema=source_table.schema
-            ))
+            operations.append(DropTableOp(source_table.name, schema=source_table.schema))
             return operations
 
         # Handle table modification
@@ -151,24 +145,24 @@ else:
                 from sqlalchemy import Column
                 from sqlmeta.adapters.sqlalchemy import _map_sql_type_to_sa
 
-                operations.append(AddColumnOp(
-                    target_table.name,
-                    Column(
-                        target_col.name,
-                        _map_sql_type_to_sa(target_col.data_type),
-                        nullable=target_col.nullable,
-                        default=target_col.default_value,
-                    ),
-                    schema=target_table.schema
-                ))
+                operations.append(
+                    AddColumnOp(
+                        target_table.name,
+                        Column(
+                            target_col.name,
+                            _map_sql_type_to_sa(target_col.data_type),
+                            nullable=target_col.nullable,
+                            default=target_col.default_value,
+                        ),
+                        schema=target_table.schema,
+                    )
+                )
 
             # Generate operations for extra columns (deletions)
             for col_name in diff.extra_columns:
-                operations.append(DropColumnOp(
-                    source_table.name,
-                    col_name,
-                    schema=source_table.schema
-                ))
+                operations.append(
+                    DropColumnOp(source_table.name, col_name, schema=source_table.schema)
+                )
 
             # Generate operations for modified columns
             for col_diff in diff.modified_columns:
@@ -184,6 +178,7 @@ else:
                 # Add modifications
                 if col_diff.type_mismatch:
                     from sqlmeta.adapters.sqlalchemy import _map_sql_type_to_sa
+
                     alter_kwargs["type_"] = _map_sql_type_to_sa(target_col.data_type)
 
                 if col_diff.nullable_mismatch:
@@ -196,12 +191,11 @@ else:
 
         return operations
 
-
     def generate_migration_script(
         source_tables: List[Table],
         target_tables: List[Table],
         dialect: Optional[str] = None,
-        message: str = "Auto-generated migration"
+        message: str = "Auto-generated migration",
     ) -> str:
         """Generate a complete Alembic migration script.
 
@@ -275,12 +269,11 @@ def downgrade() -> None:
 '''
         return script
 
-
     def _get_timestamp() -> str:
         """Get current timestamp in Alembic format."""
         from datetime import datetime
-        return datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
 
+        return datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
 
     def _format_operations(operations: List, indent: int = 1) -> str:
         """Format operations as Python code.
@@ -329,11 +322,11 @@ def downgrade() -> None:
             elif isinstance(op, AlterColumnOp):
                 schema_part = f", schema='{op.schema}'" if op.schema else ""
                 kwargs = []
-                if hasattr(op, 'type_') and op.type_ is not None:
+                if hasattr(op, "type_") and op.type_ is not None:
                     kwargs.append(f"type_={op.type_}")
-                if hasattr(op, 'nullable') and op.nullable is not None:
+                if hasattr(op, "nullable") and op.nullable is not None:
                     kwargs.append(f"nullable={op.nullable}")
-                if hasattr(op, 'server_default'):
+                if hasattr(op, "server_default"):
                     kwargs.append(f"server_default={repr(op.server_default)}")
 
                 lines.append(
@@ -345,7 +338,6 @@ def downgrade() -> None:
                 lines.append(f"{indent_str})")
 
         return "\n".join(lines) if lines else f"{indent_str}pass"
-
 
     def _format_column(column) -> str:
         """Format a SQLAlchemy column as Python code.

@@ -14,11 +14,9 @@ users_table = Table(
     ],
     constraints=[
         SqlConstraint(
-            constraint_type=ConstraintType.UNIQUE,
-            name="uq_users_email",
-            column_names=["email"]
+            constraint_type=ConstraintType.UNIQUE, name="uq_users_email", column_names=["email"]
         )
-    ]
+    ],
 )
 
 # Print CREATE TABLE statement

@@ -32,32 +32,29 @@ try:
         UniqueConstraint,
     )
     from sqlalchemy.schema import CreateTable
+
     SQLALCHEMY_AVAILABLE = True
 except ImportError:
     SQLALCHEMY_AVAILABLE = False
 
 
 if not SQLALCHEMY_AVAILABLE:
+
     def to_sqlalchemy(*args, **kwargs):
         raise ImportError(
-            "SQLAlchemy is not installed. "
-            "Install it with: pip install sqlmeta[sqlalchemy]"
+            "SQLAlchemy is not installed. " "Install it with: pip install sqlmeta[sqlalchemy]"
         )
 
     def from_sqlalchemy(*args, **kwargs):
         raise ImportError(
-            "SQLAlchemy is not installed. "
-            "Install it with: pip install sqlmeta[sqlalchemy]"
+            "SQLAlchemy is not installed. " "Install it with: pip install sqlmeta[sqlalchemy]"
         )
+
 else:
     from sqlmeta import Table, SqlColumn, SqlConstraint
     from sqlmeta.base import ConstraintType
 
-
-    def to_sqlalchemy(
-        table: Table,
-        metadata: Optional[MetaData] = None
-    ) -> SATable:
+    def to_sqlalchemy(table: Table, metadata: Optional[MetaData] = None) -> SATable:
         """Convert sqlmeta Table to SQLAlchemy Table.
 
         Args:
@@ -95,25 +92,19 @@ else:
                 primary_key=col.is_primary_key,
                 unique=col.is_unique,
                 default=col.default_value,
-                comment=getattr(col, 'comment', None),
-                autoincrement=getattr(col, 'is_identity', False),
+                comment=getattr(col, "comment", None),
+                autoincrement=getattr(col, "is_identity", False),
             )
             columns.append(sa_col)
 
         # Convert constraints
         for constraint in table.constraints:
             if constraint.constraint_type == ConstraintType.PRIMARY_KEY:
-                columns.append(
-                    PrimaryKeyConstraint(*constraint.columns, name=constraint.name)
-                )
+                columns.append(PrimaryKeyConstraint(*constraint.columns, name=constraint.name))
             elif constraint.constraint_type == ConstraintType.UNIQUE:
-                columns.append(
-                    UniqueConstraint(*constraint.columns, name=constraint.name)
-                )
+                columns.append(UniqueConstraint(*constraint.columns, name=constraint.name))
             elif constraint.constraint_type == ConstraintType.CHECK:
-                columns.append(
-                    CheckConstraint(constraint.check_expression, name=constraint.name)
-                )
+                columns.append(CheckConstraint(constraint.check_expression, name=constraint.name))
 
         # Create SQLAlchemy table
         sa_table = SATable(
@@ -121,11 +112,10 @@ else:
             metadata,
             *columns,
             schema=table.schema,
-            comment=getattr(table, 'comment', None),
+            comment=getattr(table, "comment", None),
         )
 
         return sa_table
-
 
     def from_sqlalchemy(sa_table: SATable) -> Table:
         """Convert SQLAlchemy Table to sqlmeta Table.
@@ -173,7 +163,6 @@ else:
 
         return table
 
-
     def get_create_ddl(table: Table, dialect: str = "postgresql") -> str:
         """Get CREATE TABLE DDL for a sqlmeta Table.
 
@@ -196,7 +185,6 @@ else:
         create_stmt = CreateTable(sa_table)
         return str(create_stmt.compile(engine))
 
-
     def _map_sql_type_to_sa(sql_type: str):
         """Map SQL type string to SQLAlchemy type."""
         import re
@@ -204,29 +192,29 @@ else:
         sql_type_upper = sql_type.upper()
 
         # Integer types
-        if any(t in sql_type_upper for t in ['INT', 'SERIAL', 'BIGINT', 'SMALLINT']):
+        if any(t in sql_type_upper for t in ["INT", "SERIAL", "BIGINT", "SMALLINT"]):
             return Integer()
 
         # String types
-        if 'VARCHAR' in sql_type_upper or 'CHAR' in sql_type_upper:
-            match = re.search(r'\((\d+)\)', sql_type)
+        if "VARCHAR" in sql_type_upper or "CHAR" in sql_type_upper:
+            match = re.search(r"\((\d+)\)", sql_type)
             if match:
                 return String(int(match.group(1)))
             return String()
 
-        if 'TEXT' in sql_type_upper or 'CLOB' in sql_type_upper:
+        if "TEXT" in sql_type_upper or "CLOB" in sql_type_upper:
             return Text()
 
         # Boolean
-        if 'BOOL' in sql_type_upper:
+        if "BOOL" in sql_type_upper:
             return Boolean()
 
         # Timestamp/DateTime
-        if any(t in sql_type_upper for t in ['TIMESTAMP', 'DATETIME', 'DATE', 'TIME']):
+        if any(t in sql_type_upper for t in ["TIMESTAMP", "DATETIME", "DATE", "TIME"]):
             return DateTime()
 
         # Numeric/Decimal
-        if any(t in sql_type_upper for t in ['NUMERIC', 'DECIMAL', 'FLOAT', 'DOUBLE', 'REAL']):
+        if any(t in sql_type_upper for t in ["NUMERIC", "DECIMAL", "FLOAT", "DOUBLE", "REAL"]):
             return Numeric()
 
         # Default to String
@@ -234,7 +222,7 @@ else:
 
 
 __all__ = [
-    'to_sqlalchemy',
-    'from_sqlalchemy',
-    'get_create_ddl',
+    "to_sqlalchemy",
+    "from_sqlalchemy",
+    "get_create_ddl",
 ]
