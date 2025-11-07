@@ -9,6 +9,7 @@ sqlmeta Documentation
    :maxdepth: 2
    :caption: Contents:
 
+   why_sqlmeta
    installation
    quickstart
    api/index

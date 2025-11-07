@@ -15,6 +15,87 @@
 - **Generate migration scripts** by comparing source and target schemas
 - **Parse and represent** complex database objects across PostgreSQL, MySQL, Oracle, SQL Server, and more
 
+## Why sqlmeta?
+
+**"Why not just use SQLAlchemy directly?"**
+
+While SQLAlchemy is excellent for ORM and database operations, sqlmeta solves different problems:
+
+### 1. **Schema Comparison & Drift Detection**
+SQLAlchemy represents schemas for *your application*. sqlmeta compares schemas from *different sources*:
+- Compare SQL scripts against live databases
+- Detect drift between dev, staging, and production
+- Validate that migrations were applied correctly
+- Compare schemas across different database vendors
+
+```python
+# sqlmeta excels at this - SQLAlchemy doesn't provide this functionality
+from sqlmeta.comparison.comparator import ObjectComparator
+
+diff = comparator.compare_tables(source_table, target_table)
+if diff.has_diffs:
+    print(f"Schema drift detected! Severity: {diff.severity}")
+    for col in diff.missing_columns:
+        print(f"Missing column: {col}")
+```
+
+### 2. **Lightweight & Serializable**
+SQLAlchemy metadata is tightly coupled to engines and sessions. sqlmeta is pure data:
+- **Zero dependencies** for core functionality
+- **JSON serializable** - store schemas in files, databases, or APIs
+- **Language agnostic** - share schemas between Python, Go, Node.js services
+- **Version control friendly** - track schema changes in git
+
+```python
+# sqlmeta schemas are just data
+schema = table.to_dict()
+with open('schema.json', 'w') as f:
+    json.dump(schema, f)
+
+# Recreate anywhere, anytime
+table = Table.from_dict(schema)
+```
+
+### 3. **Broader Database Object Support**
+SQLAlchemy focuses on tables for ORM. sqlmeta represents the full database:
+- Stored procedures and packages (Oracle, SQL Server)
+- Triggers with full metadata
+- Database links and foreign data wrappers
+- Extensions, events, synonyms
+- Partitioning strategies
+- And more...
+
+### 4. **Multi-Dialect Schema Translation**
+Maintain one schema definition, deploy to multiple databases:
+```python
+# Define once
+base_schema = Table("users", columns=[...])
+
+# Generate for each dialect
+pg_ddl = base_schema.to_sql(dialect="postgresql")
+mysql_ddl = base_schema.to_sql(dialect="mysql")
+oracle_ddl = base_schema.to_sql(dialect="oracle")
+```
+
+### 5. **Integration Hub**
+sqlmeta acts as a universal adapter between tools:
+- Parse SQL scripts → convert to SQLAlchemy → generate Pydantic models
+- Read from database A → compare with schema B → generate Alembic migrations
+- Extract schema from SQLAlchemy → store in JSON → recreate in another language
+
+### When to Use What?
+
+| Use Case | Tool |
+|----------|------|
+| ORM for your application | **SQLAlchemy** |
+| Schema comparison & drift detection | **sqlmeta** |
+| Database queries and transactions | **SQLAlchemy** |
+| Cross-database schema translation | **sqlmeta** |
+| Schema versioning and serialization | **sqlmeta** |
+| Integration between tools | **sqlmeta** |
+
+**Use them together!** sqlmeta complements SQLAlchemy - it even includes bidirectional converters.
+
 ## Key Features
 
 - **Dialect-agnostic schema representation** - Work with SQL metadata without worrying about database-specific quirks
