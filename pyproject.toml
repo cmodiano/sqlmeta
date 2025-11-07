@@ -59,10 +59,10 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourorg/sqlmeta"
+Homepage = "https://github.com/cmodiano/sqlmeta"
 Documentation = "https://sqlmeta.readthedocs.io"
-Repository = "https://github.com/yourorg/sqlmeta"
-Issues = "https://github.com/yourorg/sqlmeta/issues"
+Repository = "https://github.com/cmodiano/sqlmeta"
+Issues = "https://github.com/cmodiano/sqlmeta/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]

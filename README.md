@@ -307,7 +307,7 @@ for table in schema.tables:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourorg/sqlmeta.git
+git clone https://github.com/cmodiano/sqlmeta.git
 cd sqlmeta
 
 # Create virtual environment
@@ -380,9 +380,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Support
 
 - **Documentation**: [https://sqlmeta.readthedocs.io](https://sqlmeta.readthedocs.io)
-- **Issues**: [https://github.com/yourorg/sqlmeta/issues](https://github.com/yourorg/sqlmeta/issues)
-- **Discussions**: [https://github.com/yourorg/sqlmeta/discussions](https://github.com/yourorg/sqlmeta/discussions)
+- **Issues**: [https://github.com/cmodiano/sqlmeta/issues](https://github.com/cmodiano/sqlmeta/issues)
+- **Discussions**: [https://github.com/cmodiano/sqlmeta/discussions](https://github.com/cmodiano/sqlmeta/discussions)
 
 ## Acknowledgments
 
-This project was extracted and enhanced from the [DBLift](https://github.com/yourorg/dblift) project to provide a standalone, reusable library for SQL metadata representation.
+This project was extracted and enhanced from the [DBLift](https://github.com/cmodiano/dblift) project to provide a standalone, reusable library for SQL metadata representation.
