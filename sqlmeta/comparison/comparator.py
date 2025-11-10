@@ -124,12 +124,12 @@ def _extract_base_identity_type(data_type: str, dialect: str) -> str:
 
     # PostgreSQL SERIAL types map to INTEGER/BIGINT
     if dialect == "postgresql":
-        if data_type_upper == "SERIAL" or "SERIAL" in data_type_upper:
-            return "INTEGER"
-        if data_type_upper == "BIGSERIAL" or "BIGSERIAL" in data_type_upper:
+        if data_type_upper.startswith("BIGSERIAL"):
             return "BIGINT"
-        if data_type_upper == "SMALLSERIAL" or "SMALLSERIAL" in data_type_upper:
+        if data_type_upper.startswith("SMALLSERIAL"):
             return "SMALLINT"
+        if data_type_upper.startswith("SERIAL"):
+            return "INTEGER"
 
     # Remove identity-related keywords for other dialects
     identity_keywords = [
@@ -147,6 +147,7 @@ def _extract_base_identity_type(data_type: str, dialect: str) -> str:
     import re
 
     result = re.sub(r"IDENTITY\s*\(\s*\d+\s*,\s*\d+\s*\)", "", result).strip()
+    result = re.sub(r"\(\s*\d+\s*,\s*\d+\s*\)", "", result).strip()
 
     return result if result else data_type
 
