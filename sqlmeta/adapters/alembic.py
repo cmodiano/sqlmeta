@@ -52,6 +52,7 @@ else:
     from sqlmeta import Table, SqlColumn
     from sqlmeta.comparison.comparator import ObjectComparator
     from sqlmeta.comparison.diff_models import TableDiff
+    from sqlmeta.comparison.type_normalizer import DataTypeNormalizer
 
     def to_alembic_table(table: Table) -> CreateTableOp:
         """Convert sqlmeta Table to Alembic CreateTableOp.
@@ -133,14 +134,21 @@ else:
 
         # Handle table modification
         if source_table is not None and target_table is not None:
-            comparator = ObjectComparator(dialect=dialect or source_table.dialect)
-            diff = comparator.compare_tables(source_table, target_table)
+            normalizer = DataTypeNormalizer()
+            comparison_dialect = (
+                dialect
+                or getattr(target_table, "dialect", None)
+                or getattr(source_table, "dialect", None)
+                or "postgresql"
+            )
+            comparator = ObjectComparator(normalizer)
+            diff = comparator.compare_tables(source_table, target_table, comparison_dialect)
 
             if not diff.has_diffs:
                 return operations
 
-            # Generate operations for missing columns (additions)
-            for col_name in diff.missing_columns:
+            # Generate operations for new columns that exist in target but not source
+            for col_name in diff.extra_columns:
                 target_col = next(c for c in target_table.columns if c.name == col_name)
                 from sqlalchemy import Column
                 from sqlmeta.adapters.sqlalchemy import _map_sql_type_to_sa
@@ -152,14 +160,14 @@ else:
                             target_col.name,
                             _map_sql_type_to_sa(target_col.data_type),
                             nullable=target_col.nullable,
-                            default=target_col.default_value,
+                            server_default=target_col.default_value,
                         ),
                         schema=target_table.schema,
                     )
                 )
 
-            # Generate operations for extra columns (deletions)
-            for col_name in diff.extra_columns:
+            # Generate operations for columns that exist in source but not in target
+            for col_name in diff.missing_columns:
                 operations.append(
                     DropColumnOp(source_table.name, col_name, schema=source_table.schema)
                 )
@@ -176,15 +184,15 @@ else:
                 }
 
                 # Add modifications
-                if col_diff.type_mismatch:
+                if col_diff.data_type_diff:
                     from sqlmeta.adapters.sqlalchemy import _map_sql_type_to_sa
 
                     alter_kwargs["type_"] = _map_sql_type_to_sa(target_col.data_type)
 
-                if col_diff.nullable_mismatch:
+                if col_diff.nullable_diff:
                     alter_kwargs["nullable"] = target_col.nullable
 
-                if col_diff.default_mismatch:
+                if col_diff.default_diff:
                     alter_kwargs["server_default"] = target_col.default_value
 
                 operations.append(AlterColumnOp(**alter_kwargs))
